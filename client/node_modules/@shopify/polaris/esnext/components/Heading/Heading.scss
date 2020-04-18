@@ -1,0 +1,6 @@
+@import '../../styles/common';
+
+.Heading {
+  @include text-style-heading;
+  margin: 0;
+}

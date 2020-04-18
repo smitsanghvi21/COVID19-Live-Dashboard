@@ -1,0 +1,3 @@
+import React from 'react';
+import { Features } from './types';
+export declare const FeaturesContext: React.Context<Features | undefined>;

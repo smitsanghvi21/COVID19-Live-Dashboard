@@ -1,0 +1,64 @@
+@import '../../../../styles/common';
+
+$breakpoint: em(640px);
+$Backdrop-opacity: 0.88;
+
+.Toast {
+  @include text-style-display-small;
+  display: inline-flex;
+  max-width: rem(500px);
+  padding: spacing(tight) spacing();
+  border-radius: var(--p-border-radius-wide, border-radius());
+  background: var(--p-surface, rgba(color('black'), $Backdrop-opacity));
+  box-shadow: var(--p-override-none, shadow());
+  color: var(--p-text, color('white'));
+  margin-bottom: spacing(loose);
+
+  @include breakpoint-after($breakpoint) {
+    padding: spacing();
+  }
+
+  @media (-ms-high-contrast: active) {
+    border: border-width(thick) solid ms-high-contrast-color('text');
+  }
+}
+
+.Action {
+  margin-left: spacing(extra-loose);
+  margin-right: spacing();
+}
+
+.error {
+  $error-color: var(--p-text-on-critical, color('white'));
+  background: var(
+    --p-action-critical,
+    rgba(color('red', 'dark'), $Backdrop-opacity)
+  );
+  color: $error-color;
+
+  .CloseButton {
+    fill: var(--p-icon-on-critical, $error-color);
+  }
+}
+
+.CloseButton {
+  display: flex;
+  align-self: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin: (-1 * spacing(tight)) (-1 * spacing()) (-1 * spacing(tight)) 0;
+  padding: (1.5 * spacing(tight)) spacing() spacing(tight);
+  border: none;
+  appearance: none;
+  background: transparent;
+  fill: var(--p-icon, color('white'));
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+
+  @media (-ms-high-contrast: active) {
+    fill: ms-high-contrast-color('text');
+  }
+}

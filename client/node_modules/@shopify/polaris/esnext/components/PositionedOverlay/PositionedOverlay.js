@@ -1,0 +1,160 @@
+import React from 'react';
+import { getRectForNode } from '@shopify/javascript-utilities/geometry';
+import { closest } from '@shopify/javascript-utilities/dom';
+import { classNames } from '../../utilities/css';
+import { EventListener } from '../EventListener';
+import { Scrollable } from '../Scrollable';
+import { layer } from '../shared';
+import { calculateVerticalPosition, calculateHorizontalPosition, rectIsOutsideOfRect, intersectionWithViewport, windowRect, } from './utilities/math';
+import styles from './PositionedOverlay.scss';
+const OBSERVER_CONFIG = { childList: true, subtree: true };
+export class PositionedOverlay extends React.PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            measuring: true,
+            activatorRect: getRectForNode(this.props.activator),
+            right: undefined,
+            left: undefined,
+            top: 0,
+            height: 0,
+            width: null,
+            positioning: 'below',
+            zIndex: null,
+            outsideScrollableContainer: false,
+            lockPosition: false,
+        };
+        this.overlay = null;
+        this.scrollableContainer = null;
+        this.overlayDetails = () => {
+            const { measuring, left, right, positioning, height, activatorRect, } = this.state;
+            return {
+                measuring,
+                left,
+                right,
+                desiredHeight: height,
+                positioning,
+                activatorRect,
+            };
+        };
+        this.setOverlay = (node) => {
+            this.overlay = node;
+        };
+        this.handleMeasurement = () => {
+            const { lockPosition, top } = this.state;
+            this.observer.disconnect();
+            this.setState(({ left, top, right }) => ({
+                left,
+                right,
+                top,
+                height: 0,
+                positioning: 'below',
+                measuring: true,
+            }), () => {
+                if (this.overlay == null || this.scrollableContainer == null) {
+                    return;
+                }
+                const { activator, preferredPosition = 'below', preferredAlignment = 'center', onScrollOut, fullWidth, fixed, preferInputActivator = true, } = this.props;
+                const preferredActivator = preferInputActivator
+                    ? activator.querySelector('input') || activator
+                    : activator;
+                const activatorRect = getRectForNode(preferredActivator);
+                const currentOverlayRect = getRectForNode(this.overlay);
+                const scrollableElement = isDocument(this.scrollableContainer)
+                    ? document.body
+                    : this.scrollableContainer;
+                const scrollableContainerRect = getRectForNode(scrollableElement);
+                const overlayRect = fullWidth
+                    ? Object.assign(Object.assign({}, currentOverlayRect), { width: activatorRect.width }) : currentOverlayRect;
+                // If `body` is 100% height, it still acts as though it were not constrained to that size. This adjusts for that.
+                if (scrollableElement === document.body) {
+                    scrollableContainerRect.height = document.body.scrollHeight;
+                }
+                const overlayMargins = this.overlay.firstElementChild &&
+                    this.overlay.firstChild instanceof HTMLElement
+                    ? getMarginsForNode(this.overlay.firstElementChild)
+                    : { activator: 0, container: 0, horizontal: 0 };
+                const containerRect = windowRect();
+                const zIndexForLayer = getZIndexForLayerFromNode(activator);
+                const zIndex = zIndexForLayer == null ? zIndexForLayer : zIndexForLayer + 1;
+                const verticalPosition = calculateVerticalPosition(activatorRect, overlayRect, overlayMargins, scrollableContainerRect, containerRect, preferredPosition, fixed);
+                const horizontalPosition = calculateHorizontalPosition(activatorRect, overlayRect, containerRect, overlayMargins, preferredAlignment);
+                this.setState({
+                    measuring: false,
+                    activatorRect: getRectForNode(activator),
+                    left: preferredAlignment !== 'right' ? horizontalPosition : undefined,
+                    right: preferredAlignment === 'right' ? horizontalPosition : undefined,
+                    top: lockPosition ? top : verticalPosition.top,
+                    lockPosition: Boolean(fixed),
+                    height: verticalPosition.height || 0,
+                    width: fullWidth ? overlayRect.width : null,
+                    positioning: verticalPosition.positioning,
+                    outsideScrollableContainer: onScrollOut != null &&
+                        rectIsOutsideOfRect(activatorRect, intersectionWithViewport(scrollableContainerRect)),
+                    zIndex,
+                }, () => {
+                    if (!this.overlay)
+                        return;
+                    this.observer.observe(this.overlay, OBSERVER_CONFIG);
+                });
+            });
+        };
+        this.observer = new MutationObserver(this.handleMeasurement);
+    }
+    componentDidMount() {
+        this.scrollableContainer = Scrollable.forNode(this.props.activator);
+        if (this.scrollableContainer && !this.props.fixed) {
+            this.scrollableContainer.addEventListener('scroll', this.handleMeasurement);
+        }
+        this.handleMeasurement();
+    }
+    componentWillUnmount() {
+        if (this.scrollableContainer && !this.props.fixed) {
+            this.scrollableContainer.removeEventListener('scroll', this.handleMeasurement);
+        }
+    }
+    componentDidUpdate() {
+        const { outsideScrollableContainer, top } = this.state;
+        const { onScrollOut, active } = this.props;
+        if (active &&
+            onScrollOut != null &&
+            top !== 0 &&
+            outsideScrollableContainer) {
+            onScrollOut();
+        }
+    }
+    render() {
+        const { left, right, top, zIndex, width } = this.state;
+        const { render, fixed, classNames: propClassNames } = this.props;
+        const style = {
+            top: top == null || isNaN(top) ? undefined : top,
+            left: left == null || isNaN(left) ? undefined : left,
+            right: right == null || isNaN(right) ? undefined : right,
+            width: width == null || isNaN(width) ? undefined : width,
+            zIndex: zIndex == null || isNaN(zIndex) ? undefined : zIndex,
+        };
+        const className = classNames(styles.PositionedOverlay, fixed && styles.fixed, propClassNames);
+        return (<div className={className} style={style} ref={this.setOverlay}>
+        <EventListener event="resize" handler={this.handleMeasurement}/>
+        {render(this.overlayDetails())}
+      </div>);
+    }
+}
+function getMarginsForNode(node) {
+    const nodeStyles = window.getComputedStyle(node);
+    return {
+        activator: parseFloat(nodeStyles.marginTop || '0'),
+        container: parseFloat(nodeStyles.marginBottom || '0'),
+        horizontal: parseFloat(nodeStyles.marginLeft || '0'),
+    };
+}
+function getZIndexForLayerFromNode(node) {
+    const layerNode = closest(node, layer.selector) || document.body;
+    const zIndex = layerNode === document.body
+        ? 'auto'
+        : parseInt(window.getComputedStyle(layerNode).zIndex || '0', 10);
+    return zIndex === 'auto' || isNaN(zIndex) ? null : zIndex;
+}
+function isDocument(node) {
+    return node === document;
+}

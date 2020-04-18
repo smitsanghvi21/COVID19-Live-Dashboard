@@ -1,0 +1,19 @@
+@import '../../styles/common';
+
+@mixin text-container-spacing($spacing: base) {
+  > *:not(:first-child) {
+    margin-top: (spacing($spacing));
+  }
+}
+
+.TextContainer {
+  @include text-container-spacing;
+}
+
+.spacingTight {
+  @include text-container-spacing(tight);
+}
+
+.spacingLoose {
+  @include text-container-spacing(loose);
+}

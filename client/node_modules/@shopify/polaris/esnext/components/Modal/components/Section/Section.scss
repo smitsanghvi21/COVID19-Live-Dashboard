@@ -1,0 +1,18 @@
+@import '../../../../styles/common';
+
+.Section {
+  flex: 0 0 auto;
+  padding: spacing(loose);
+
+  &:not(:last-of-type) {
+    border-bottom: border();
+  }
+
+  &.subdued {
+    background: var(--p-surface-subdued, color('sky', 'light'));
+  }
+
+  &.flush {
+    padding: 0;
+  }
+}

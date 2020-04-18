@@ -1,0 +1,48 @@
+/// <reference types="hoist-non-react-statics" />
+import React from 'react';
+import { FeaturesContext } from '../../utilities/features';
+import { WithAppProviderProps } from '../../utilities/with-app-provider';
+import { TabDescriptor } from './types';
+export interface TabsProps {
+    /** Content to display in tabs */
+    children?: React.ReactNode;
+    /** Index of selected tab */
+    selected: number;
+    /** List of tabs */
+    tabs: TabDescriptor[];
+    /** Fit tabs to container */
+    fitted?: boolean;
+    /** Callback when tab is selected */
+    onSelect?(selectedTabIndex: number): void;
+}
+declare type CombinedProps = TabsProps & WithAppProviderProps;
+interface State {
+    disclosureWidth: number;
+    tabWidths: number[];
+    visibleTabs: number[];
+    hiddenTabs: number[];
+    containerWidth: number;
+    showDisclosure: boolean;
+    tabToFocus: number;
+}
+declare class TabsInner extends React.PureComponent<CombinedProps, State> {
+    static contextType: React.Context<import("../../utilities/features").Features | undefined>;
+    static getDerivedStateFromProps(nextProps: TabsProps, prevState: State): {
+        visibleTabs: number[];
+        hiddenTabs: number[];
+        selected: number;
+    };
+    context: React.ContextType<typeof FeaturesContext>;
+    state: State;
+    render(): JSX.Element;
+    private handleKeyPress;
+    private renderTabMarkup;
+    private handleFocus;
+    private handleBlur;
+    private handleDisclosureActivatorClick;
+    private handleClose;
+    private handleMeasurement;
+    private handleTabClick;
+}
+export declare const Tabs: React.FunctionComponent<TabsProps> & import("hoist-non-react-statics").NonReactStatics<(React.ComponentClass<CombinedProps, any> & typeof TabsInner) | (React.FunctionComponent<CombinedProps> & typeof TabsInner), {}>;
+export {};

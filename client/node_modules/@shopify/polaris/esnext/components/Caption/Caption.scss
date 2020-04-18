@@ -1,0 +1,6 @@
+@import '../../styles/common';
+
+.Caption {
+  @include text-style-caption;
+  margin: 0;
+}

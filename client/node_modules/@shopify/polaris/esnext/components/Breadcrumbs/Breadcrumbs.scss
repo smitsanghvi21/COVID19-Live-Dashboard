@@ -1,0 +1,86 @@
+@import '../../styles/common';
+
+$vertical-padding: (control-height() - line-height(body)) / 2;
+$horizontal-padding: spacing(tight);
+$icon-size: rem(20px);
+
+$difference-between-touch-area-and-backdrop: control-height() -
+  control-slim-height();
+
+.Breadcrumb {
+  @include text-style-body;
+  @include text-emphasis-subdued;
+  @include unstyled-button;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: control-height();
+
+  margin: (-0.5 * $difference-between-touch-area-and-backdrop)
+    (-1 * $horizontal-padding)
+    (-0.5 * $difference-between-touch-area-and-backdrop)
+    (-0.5 * $horizontal-padding);
+
+  color: var(--p-text-subdued, color('ink', 'lighter'));
+  text-decoration: none;
+
+  &.newDesignLanguage {
+    margin-left: 0;
+  }
+
+  &:hover,
+  &:active {
+    color: var(--p-text, color('ink'));
+    text-decoration: none;
+
+    .Icon {
+      @include recolor-icon(var(--p-icon-pressed, color('ink')));
+    }
+  }
+  // stylelint-disable selector-max-specificity
+  &:focus {
+    outline: none;
+    .ContentWrapper {
+      background: var(--p-override-transparent, plain-button-background());
+    }
+  }
+
+  &:active {
+    .ContentWrapper {
+      background: var(--p-surface-subdued, plain-button-background());
+    }
+  }
+
+  &:focus:not(:active) {
+    .ContentWrapper {
+      @include focus-ring($style: 'focused');
+    }
+  }
+  // stylelint-enable selector-max-specificity
+}
+
+.ContentWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: $vertical-padding $horizontal-padding;
+  background: transparent;
+  height: control-slim-height();
+  border-radius: var(--p-border-radius-base, border-radius());
+  will-change: background;
+  transition: background duration() easing();
+  @include focus-ring;
+}
+
+.Content {
+  @include truncate;
+  position: relative;
+}
+
+.Icon {
+  @include recolor-icon(var(--p-icon, color('ink', 'lighter')));
+  width: $icon-size;
+  height: $icon-size;
+  margin: (-0.5 * $icon-size) 0 (-0.5 * $icon-size) rem(-8px);
+  margin: 0 0 0 rem(-8px);
+}

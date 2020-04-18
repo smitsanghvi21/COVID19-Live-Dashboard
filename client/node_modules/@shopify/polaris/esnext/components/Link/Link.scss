@@ -1,0 +1,82 @@
+@import '../../styles/common';
+
+.Link {
+  appearance: none;
+  display: inline;
+  text-align: inherit;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: inherit;
+  color: var(--p-interactive, color('blue'));
+  text-decoration: none;
+  cursor: pointer;
+
+  &.newDesignLanguage {
+    text-decoration: underline;
+  }
+
+  &:hover {
+    color: var(--p-interactive-hovered, color('blue', 'dark'));
+    text-decoration: underline;
+  }
+
+  &:focus {
+    $chrome-default-outline: rgba(0, 103, 244, 0.247) auto rem(4.5px);
+    outline: var(--p-override-none, $chrome-default-outline);
+  }
+
+  @include focus-ring;
+
+  &:focus:not(:active) {
+    @include focus-ring($style: 'focused');
+  }
+
+  &:active {
+    position: relative;
+    &::before {
+      content: var(--p-non-null-content, none);
+      position: absolute;
+      z-index: -1;
+      // this mimics the box model of the plain button backdrop
+      top: rem(-2px);
+      right: rem(-5px);
+      bottom: rem(-2px);
+      left: rem(-5px);
+      display: block;
+
+      border-radius: border-radius();
+    }
+    color: var(--p-interactive-pressed, color('blue', 'dark'));
+    text-decoration: underline;
+  }
+}
+
+.IconLockup {
+  @include recolor-icon(currentColor);
+  display: inline;
+  white-space: nowrap;
+
+  &::before {
+    content: '\2060';
+  }
+}
+
+.IconLayout {
+  display: inline-flex;
+
+  &::before {
+    content: '\2060';
+  }
+}
+
+.monochrome {
+  color: inherit;
+  text-decoration: underline;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: inherit;
+  }
+}

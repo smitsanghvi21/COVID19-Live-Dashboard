@@ -1,0 +1,15 @@
+@import '../../../../styles/common';
+
+.Header {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+  padding: spacing() spacing(loose);
+  border-bottom: var(--p-thin-border-subdued, border());
+}
+
+.Title {
+  @include text-breakword;
+  flex: 1;
+  margin-top: spacing(extra-tight);
+}

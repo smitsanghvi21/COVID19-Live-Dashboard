@@ -1,0 +1,24 @@
+@import '../../styles/common';
+
+.OptionList {
+  @include unstyled-list;
+
+  &.newDesignLanguage {
+    padding: spacing(tight);
+  }
+}
+
+.Options {
+  @include unstyled-list;
+}
+
+.Title {
+  @include text-style-subheading;
+  padding: spacing(tight) spacing();
+  border-bottom: var(--p-override-none, border());
+
+  .newDesignLanguage & {
+    padding: spacing(tight);
+    color: var(--p-text-subdued);
+  }
+}

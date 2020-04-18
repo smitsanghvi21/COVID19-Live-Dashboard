@@ -1,0 +1,23 @@
+import React from 'react';
+import { HorizontalDotsMinor } from '@shopify/polaris-icons';
+import { useI18n } from '../../../../utilities/i18n';
+import { useToggle } from '../../../../utilities/use-toggle';
+import { useFeatures } from '../../../../utilities/features';
+import { ActionList } from '../../../ActionList';
+import { Button } from '../../../Button';
+import { Popover } from '../../../Popover';
+import styles from './RollupActions.scss';
+export function RollupActions({ items = [], sections = [] }) {
+    const i18n = useI18n();
+    const { newDesignLanguage } = useFeatures();
+    const { value: rollupOpen, toggle: toggleRollupOpen } = useToggle(false);
+    if (items.length === 0 && sections.length === 0) {
+        return null;
+    }
+    const activatorMarkup = (<div className={styles.RollupActivator}>
+      <Button plain={!newDesignLanguage} icon={HorizontalDotsMinor} accessibilityLabel={i18n.translate('Polaris.ActionMenu.RollupActions.rollupButton')} onClick={toggleRollupOpen}/>
+    </div>);
+    return (<Popover active={rollupOpen} activator={activatorMarkup} preferredAlignment="right" onClose={toggleRollupOpen}>
+      <ActionList items={items} sections={sections} onActionAnyItem={toggleRollupOpen}/>
+    </Popover>);
+}

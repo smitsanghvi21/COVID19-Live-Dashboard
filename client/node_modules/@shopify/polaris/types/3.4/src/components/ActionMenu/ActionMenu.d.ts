@@ -1,0 +1,25 @@
+import React from 'react';
+import { MenuActionDescriptor, MenuGroupDescriptor } from '../../types';
+import { FeaturesContext } from '../../utilities/features';
+export interface ActionMenuProps {
+    /** Collection of page-level secondary actions */
+    actions?: MenuActionDescriptor[];
+    /** Collection of page-level action groups */
+    groups?: MenuGroupDescriptor[];
+    /** Roll up all actions into a Popover > ActionList */
+    rollup?: boolean;
+}
+interface State {
+    activeMenuGroup?: string;
+}
+export declare class ActionMenu extends React.PureComponent<ActionMenuProps, State> {
+    static contextType: React.Context<import("../../utilities/features").Features | undefined>;
+    context: React.ContextType<typeof FeaturesContext>;
+    state: State;
+    render(): JSX.Element | null;
+    private renderActions;
+    private handleMenuGroupToggle;
+    private handleMenuGroupClose;
+}
+export declare function hasGroupsWithActions(groups?: ActionMenuProps['groups']): boolean;
+export {};

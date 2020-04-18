@@ -1,0 +1,3 @@
+import React from 'react';
+import { ScrollLockManager } from './scroll-lock-manager';
+export declare const ScrollLockManagerContext: React.Context<ScrollLockManager | undefined>;

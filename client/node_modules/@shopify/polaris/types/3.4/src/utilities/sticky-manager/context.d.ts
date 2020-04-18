@@ -1,0 +1,3 @@
+import React from 'react';
+import { StickyManager } from './sticky-manager';
+export declare const StickyManagerContext: React.Context<StickyManager | undefined>;

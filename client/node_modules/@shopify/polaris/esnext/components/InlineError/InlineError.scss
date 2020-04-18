@@ -1,0 +1,15 @@
+@import '../../styles/common';
+
+$error-icon-adjustment: rem(2px);
+
+.InlineError {
+  display: flex;
+  color: var(--p-text-critical, color('red', 'dark'));
+  fill: var(--p-icon-critical, color('red', 'dark'));
+}
+
+.Icon {
+  fill: currentColor;
+  margin-left: -1 * $error-icon-adjustment;
+  margin-right: spacing(extra-tight) + $error-icon-adjustment;
+}

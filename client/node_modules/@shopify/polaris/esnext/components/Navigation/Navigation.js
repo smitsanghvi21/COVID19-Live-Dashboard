@@ -1,0 +1,40 @@
+import React from 'react';
+import { Scrollable } from '../Scrollable';
+import { classNames } from '../../utilities/css';
+import { useTheme } from '../../utilities/theme';
+import { useFeatures } from '../../utilities/features';
+import { WithinContentContext } from '../../utilities/within-content-context';
+import { Image } from '../Image';
+import { UnstyledLink } from '../UnstyledLink';
+import { getWidth } from '../../utilities/get-width';
+import { NavigationContext } from './context';
+import { Section, Item } from './components';
+import styles from './Navigation.scss';
+export const Navigation = function Navigation({ children, contextControl, location, onDismiss, }) {
+    const { logo } = useTheme();
+    const { newDesignLanguage } = useFeatures();
+    const width = getWidth(logo, 104);
+    const logoMarkup = logo && newDesignLanguage ? (<div className={styles.LogoContainer}>
+        <UnstyledLink url={logo.url || ''} className={styles.LogoLink} style={{ width }}>
+          <Image source={logo.topBarSource || ''} alt={logo.accessibilityLabel || ''} className={styles.Logo} style={{ width }}/>
+        </UnstyledLink>
+      </div>) : null;
+    const mediaMarkup = contextControl ? (<div className={styles.ContextControl}>{contextControl}</div>) : (logoMarkup);
+    const className = classNames(styles.Navigation, !mediaMarkup && newDesignLanguage && styles['Navigation-noMedia'], newDesignLanguage && styles['Navigation-newDesignLanguage']);
+    const context = {
+        location,
+        onNavigationDismiss: onDismiss,
+    };
+    return (<NavigationContext.Provider value={context}>
+      <WithinContentContext.Provider value>
+        <nav className={className}>
+          {mediaMarkup}
+          <Scrollable className={styles.PrimaryNavigation}>
+            {children}
+          </Scrollable>
+        </nav>
+      </WithinContentContext.Provider>
+    </NavigationContext.Provider>);
+};
+Navigation.Item = Item;
+Navigation.Section = Section;
